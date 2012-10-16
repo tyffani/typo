@@ -142,6 +142,26 @@ class Admin::ContentController < Admin::BaseController
   def new_or_edit
     id = params[:id]
     id = params[:article][:id] if params[:article] && params[:article][:id]
+#raise params.inspect
+    #raise params[:article].inspect
+    merge_id = params[:merge_with][:merge_id] if params[:merge_with] && params[:merge_with][:merge_id]
+#raise merge_id.inspect
+
+    # If post and the merge field is filled out, then merge articles.
+    if request.post? && params[:merge_with][:merge_id]
+      article = Article.find_by_id(id)
+      article_to_merge = Article.find_by_id(params[:merge_with][:merge_id])
+      article.body = article.body + article_to_merge.body
+      article.comments = article.comments + article_to_merge.comments
+      article.save!
+      article_to_merge.destroy
+      flash[:notice] = _('Article was successfully merged.')
+      redirect_to :action => 'index'
+      return
+#raise article.comments.inspect
+#raise @article_to_merge.inspect
+    end
+
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
