@@ -146,7 +146,7 @@ class Admin::ContentController < Admin::BaseController
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
    
    
-    @is_admin = true if current_user.admin?
+    @is_admin = current_user.admin?
     if @is_admin
       #New Code
       # If post and the merge field is filled out, then merge articles.
