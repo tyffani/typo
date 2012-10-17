@@ -416,6 +416,16 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
+  """
+  def merge_with(article_id)
+    @article_to_merge = Article.find_by_id(article_id)
+    self.body = self.body + @article_to_merge.body
+    self.comments = self.comments + @article_to_merge.comments
+    self.save!
+    @article_to_merge.destroy
+  end
+  """
+
   protected
 
   def set_published_at
