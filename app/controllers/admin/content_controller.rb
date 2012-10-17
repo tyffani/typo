@@ -145,25 +145,24 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
    
-    if session[:return_to] == "/admin"
-      #New Code
-      # If post and the merge field is filled out, then merge articles.
-      if request.post? && params[:merge_with] != ""
-        @article = Article.find_by_id(id)
-        @article_to_merge = Article.find_by_id(params[:merge_with])
-        #@article.merge_with(@article_to_merge.id)
+    
+    #New Code
+    # If post and the merge field is filled out, then merge articles.
+    if request.post? && params[:merge_with] != ""
+      @article = Article.find_by_id(id)
+      @article_to_merge = Article.find_by_id(params[:merge_with])
+      #@article.merge_with(@article_to_merge.id)
 #raise @article_to_merge.body.inspect
-        @article.body = @article.body + @article_to_merge.body
+      @article.body = @article.body + @article_to_merge.body
 #      raise @article.body.inspect
-        @article.comments = @article.comments << @article_to_merge.comments
-        @article.save!
-        @article_to_merge.destroy
-        flash[:notice] = _('Article was successfully merged.')
-        redirect_to :action => 'index'
-        return
+      @article.comments = @article.comments << @article_to_merge.comments
+      @article.save!
+      @article_to_merge.destroy
+      flash[:notice] = _('Article was successfully merged.')
+      redirect_to :action => 'index'
+      return
 #raise article.comments.inspect
 #raise @article_to_merge.inspect
-      end
     end
 
 
