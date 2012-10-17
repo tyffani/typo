@@ -148,7 +148,8 @@ class Admin::ContentController < Admin::BaseController
 #raise merge_id.inspect
 
     # If post and the merge field is filled out, then merge articles.
-    if request.post? && params[:merge_with][:merge_id]
+    if request.post? && params[:merge_with][:merge_id] != ""
+      raise params[:merge_with].inspect
       article = Article.find_by_id(id)
       article_to_merge = Article.find_by_id(params[:merge_with][:merge_id])
       article.body = article.body + article_to_merge.body
