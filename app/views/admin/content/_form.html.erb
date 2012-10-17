@@ -1,5 +1,6 @@
 <input type="hidden" name="current_editor" id="current_editor" value="<%= current_user.editor %>" />
 <input type="hidden" name="user_textfilter" id="user_textfilter" value="<%= current_user.text_filter_name %>" />
+<input type="hidden" name="merge_with" id="merge_with" value=""/>
 <div id="autosave"></div>
 <div id="article_keywords_auto_complete" class="auto_complete"></div>
 
@@ -150,11 +151,11 @@
   </div>
 
   <div class='merge_with'>
+    <%= if is_admin == true %>
     <h4><%= _("Merge Articles") %></h4>
     Article ID:
     <input name="merge_with">
     <%= button_to "Merge" %>
-
   </div>
 
 </div>
