@@ -147,20 +147,21 @@ class Admin::ContentController < Admin::BaseController
    
    
     @is_admin = current_user.admin?
+#raise @is_admin.inspect
     if @is_admin
       #New Code
       # If post and the merge field is filled out, then merge articles.
       if request.post? && params[:merge_with] != ""
-        @article = Article.find_by_id(id)
-        @article_to_merge = Article.find_by_id(params[:merge_with])
+        article = Article.find_by_id(id)
+        article_to_merge = Article.find_by_id(params[:merge_with])
         #@article.merge_with(@article_to_merge.id)
 #raise @article_to_merge.body.inspect
-        @article.body = @article.body + @article_to_merge.body
+        article.body = article.body + article_to_merge.body
 #      raise @article_to_merge.comments.inspect
-        @article.comments = @article.comments + @article_to_merge.comments
-#        raise @article.comments.inspect
-        @article.save!
-        @article_to_merge.destroy
+        article.comments << article_to_merge.comments
+        article.save!
+        article_to_merge = Article.find_by_id(params[:merge_with])
+        article_to_merge.destroy
         flash[:notice] = _('Article was successfully merged.')
         redirect_to :action => 'index'
         return
