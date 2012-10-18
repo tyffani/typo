@@ -34,8 +34,46 @@ class Admin::ContentController < Admin::BaseController
       flash[:error] = _("Error, you are not allowed to perform this action")
       return
     end
+    """
+#    raise params[:merge_with].inspect
+    @is_admin = current_user.admin?
+    if params[:merge_with] != nil
+      raise params[:merge_with].inspect
+      merge
+    else
+      new_or_edit
+    end
+    """
     new_or_edit
   end
+  """
+  def merge
+    @is_admin = current_user.admin?
+#raise @is_admin.inspect
+    if @is_admin
+      #New Code
+      # If post and the merge field is filled out, then merge articles.
+      raise params[:merge_with].inspect
+      if request.post? && params[:merge_with] != nil
+        article = Article.find_by_id(id)
+        article_to_merge = Article.find_by_id(params[:merge_with])
+        @article.merge_with(@article_to_merge.id)
+#raise @article_to_merge.body.inspect
+        article.body = article.body + article_to_merge.body
+#      raise @article_to_merge.comments.inspect
+        article.comments << article_to_merge.comments
+        article.save!
+        article_to_merge = Article.find_by_id(params[:merge_with])
+        article_to_merge.destroy
+        flash[:notice] = _('Article was successfully merged.')
+        redirect_to :action => 'index'
+        return
+#raise article.comments.inspect
+#raise @article_to_merge.inspect
+      end
+    end
+  end
+  """
 
   def destroy
     @record = Article.find(params[:id])
@@ -145,19 +183,20 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
    
-   
     @is_admin = current_user.admin?
 #raise @is_admin.inspect
     if @is_admin
       #New Code
-      # If post and the merge field is filled out, then merge articles.
-      if request.post? && params[:merge_with] != ""
+      # If post and the merge field is filled out, then merge articles
+      if params[:merge_with] == nil or params[:merge_with] == ""
+      else
+      if request.post? && (params[:merge_with] != nil or params[:merge_with] != "")
         article = Article.find_by_id(id)
         article_to_merge = Article.find_by_id(params[:merge_with])
         #@article.merge_with(@article_to_merge.id)
 #raise @article_to_merge.body.inspect
         article.body = article.body + article_to_merge.body
-#      raise @article_to_merge.comments.inspect
+#        raise @article_to_merge.body.inspect
         article.comments << article_to_merge.comments
         article.save!
         article_to_merge = Article.find_by_id(params[:merge_with])
@@ -167,6 +206,7 @@ class Admin::ContentController < Admin::BaseController
         return
 #raise article.comments.inspect
 #raise @article_to_merge.inspect
+      end
       end
     end
 
